@@ -51,6 +51,15 @@ const updateWorkout = async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(workoutId)) {
     return res.status(400).json({ message: "invalid id" })
   }
+
+  if (req.body.title !== undefined && req.body.title.trim() === "" ) { //is there title? is title empty?
+    const workout = await Workout.findById(workoutId); //find old workout
+    if (!workout) {
+      return res.status(404).json({message: "not found"}); //exists?
+    }
+    return res.status(200).json(workout); //it's empty so no change, send old
+  }
+
   try {
     const updatedWorkout = await Workout.findOneAndUpdate(
       { _id: workoutId },
