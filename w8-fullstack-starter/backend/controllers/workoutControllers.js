@@ -5,10 +5,10 @@ const mongoose = require('mongoose');
 const getAllWorkouts = async (req, res) => {
   //res.send("getAllWorkouts");
   try {
-    const workouts = await Workout.find({}).sort({createdAt: -1});
+    const workouts = await Workout.find({}).sort({ createdAt: -1 });
     res.status(200).json(workouts);
   } catch (error) {
-    res.status(500).json({message: "Failed to get"})
+    res.status(500).json({ message: "Failed to get" })
   }
 };
 
@@ -16,56 +16,77 @@ const getAllWorkouts = async (req, res) => {
 const createWorkout = async (req, res) => {
   //res.send("createWorkout");
   try {
-    const newWorkout = await Workout.create({...req.body});
+    const newWorkout = await Workout.create({ ...req.body });
     res.status(201).json(newWorkout);
   } catch (error) {
     res
       .status(400)
-      .json({message: "Failed to create a new workout", error: error.message})
+      .json({ message: "Failed to create a new workout", error: error.message })
   }
 };
 
 // GET /api/workouts/:workoutId
 const getWorkoutById = async (req, res) => {
-  const {workoutId} = req.params;
+  const { workoutId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(workoutId)) {
-    return res.status(400).json({message:"invalid id"})
-  } 
+    return res.status(400).json({ message: "invalid id" })
+  }
   try {
     const workouts = await Workout.findById(workoutId);
     if (workouts) {
       res.status(200).json(workouts);
     } else {
-      res.status(404).json({message: "not found"})
+      res.status(404).json({ message: "not found" })
     }
   } catch (error) {
-    res.status(500).json({message:"failed to retrieve workout"})
+    res.status(500).json({ message: "failed to retrieve workout" })
   }
 };
 
 // PUT /api/workouts/:workoutId 
 const updateWorkout = async (req, res) => {
-  res.send("updateWorkout");
+  const { workoutId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(workoutId)) {
+    return res.status(400).json({ message: "invalid id" })
+  }
+  try {
+    const updatedWorkout = await Workout.findOneAndUpdate(
+      { _id: workoutId },
+      { ...req.body },
+      { returnDocument: "after" }
+    );
+
+    if (updatedWorkout) {
+      res.status(200).json(updatedWorkout);
+    } else {
+      res.status(404).json({ message: "not found" })
+    }
+  } catch (error) {
+    res.status(500).json({ message: "failed to update workout" })
+  }
+
 };
+
 
 // DELETE /api/workouts/:workoutId
 const deleteWorkout = async (req, res) => {
-  const {workoutId} = req.params;
+  const { workoutId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(workoutId)) {
-    return res.status(400).json({message:"invalid id"})
-  } 
+    return res.status(400).json({ message: "invalid id" })
+  }
 
   try {
-    const deletedWorkouts = await Workout.findOneAndDelete({_id: workoutId});
+    const deletedWorkouts = await Workout.findOneAndDelete({ _id: workoutId });
     if (deletedWorkouts) {
       res.status(204).send();
     } else {
-      res.status(404).json({message: "not found"})
+      res.status(404).json({ message: "not found" })
     }
   } catch (error) {
-    res.status(500).json({message:"failed to delete workout"})
+    res.status(500).json({ message: "failed to delete workout" })
   }
 };
 
