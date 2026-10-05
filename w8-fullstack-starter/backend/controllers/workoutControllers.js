@@ -60,7 +60,7 @@ const deleteWorkout = async (req, res) => {
   try {
     const deletedWorkouts = await Workout.findOneAndDelete({_id: workoutId});
     if (deletedWorkouts) {
-      res.status(200).json();
+      res.status(204).send();
     } else {
       res.status(404).json({message: "not found"})
     }
