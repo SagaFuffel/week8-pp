@@ -25,7 +25,21 @@ const createWorkout = async (req, res) => {
 
 // GET /api/workouts/:workoutId
 const getWorkoutById = async (req, res) => {
-  res.send("getWorkoutById");
+  const { workoutId } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(workoutId)) {
+    return res.status(400).json({ message: "Invalid workout ID" });
+  }
+  try {
+    const workout = await Workout.findById(workoutId);
+    if (workout) {
+      res.status(200).json(workout);
+    } else {
+      res.status(404).json({ message: "Workout not found" });
+    }
+
+  } catch (error) {
+    res.status(500).json({ message: "failed to retrieve workout" });
+  }
 };
 
 // PUT /api/workouts/:workoutId
@@ -35,7 +49,22 @@ const updateWorkout = async (req, res) => {
 
 // DELETE /api/workouts/:workoutId
 const deleteWorkout = async (req, res) => {
-  res.send("deleteWorkout");
+  const { workoutId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(workoutId)) {
+    return res.status(400).json({ message: "Invalid workout ID" });
+  }
+
+  try {
+    const deletedWorkout = await Workout.findOneAndDelete({ _id: workoutId });
+    if (deletedWorkout) {
+      res.status(204).send(); 
+    } else {
+      res.status(404).json({ message: "workout not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete workout" });
+  }
 };
 
 module.exports = {
